@@ -1,51 +1,41 @@
 import java.net.*;
-
 import java.util.Scanner;
 
 public class UDPClient {
 
-public static void main(String[] args) throws Exception {
+    public static void main(String args[]) throws Exception {
 
-     Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-     DatagramSocket socket = new DatagramSocket();
+        DatagramSocket socket = new DatagramSocket();
 
-     InetAddress IPAddress = InetAddress.getByName("localhost");
+        InetAddress ip = InetAddress.getByName("localhost");
 
-     System.out.println("Enter a sentence:");
+        System.out.print("Enter a sentence: ");
 
-     String sentence = sc.nextLine();
+        String sentence = sc.nextLine();
 
-     byte[] sendData = sentence.getBytes();
+        byte[] sendData = sentence.getBytes();
 
-     DatagramPacket sendPacket =
+        DatagramPacket sendPacket =
+                new DatagramPacket(sendData, sendData.length, ip, 9876);
 
-             new DatagramPacket(sendData, sendData.length,
+        socket.send(sendPacket);
 
-                     IPAddress, 9876);
+        byte[] receiveData = new byte[1024];
 
-     socket.send(sendPacket);
+        DatagramPacket receivePacket =
+                new DatagramPacket(receiveData, receiveData.length);
 
-     byte[] receiveData = new byte[2048];
+        socket.receive(receivePacket);
 
-     DatagramPacket receivePacket =
+        String translated =
+                new String(receivePacket.getData(), 0, receivePacket.getLength());
 
-             new DatagramPacket(receiveData, receiveData.length);
+        System.out.println("\nTranslated Sentence:");
+        System.out.println(translated);
 
-     socket.receive(receivePacket);
-
-     String translated = new String(receivePacket.getData(), 0,
-
-             receivePacket.getLength());
-
-     System.out.println("\nTranslated Sentence:");
-
-     System.out.println(translated);
-
-     socket.close();
-
-     sc.close();
-
-}
-
+        socket.close();
+        sc.close();
+    }
 }
