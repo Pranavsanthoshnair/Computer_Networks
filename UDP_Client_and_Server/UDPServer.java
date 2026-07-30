@@ -1,6 +1,4 @@
 import java.net.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UDPServer {
 
@@ -9,24 +7,8 @@ public class UDPServer {
         DatagramSocket socket = new DatagramSocket(9876);
 
         byte[] receiveData = new byte[2048];
-        byte[] sendData;
 
-        System.out.println("UDP Server is running...");
-
-        Map<String, String> map = new HashMap<>();
-
-        map.put("tbh", "to be honest");
-        map.put("ig", "I guess");
-        map.put("tbf", "to be fair");
-        map.put("atm", "at the moment");
-        map.put("irl", "in real life");
-        map.put("lol", "laughing out loud");
-        map.put("asap", "as soon as possible");
-        map.put("omg", "oh my God");
-        map.put("ttyl", "talk to you later");
-        map.put("idk", "I don't know");
-        map.put("nvm", "never mind");
-        map.put("idc", "I don't care");
+        System.out.println("Server Running...");
 
         while (true) {
 
@@ -35,60 +17,30 @@ public class UDPServer {
 
             socket.receive(receivePacket);
 
-            String sentence = new String(
-                    receivePacket.getData(),
-                    0,
+            String sentence = new String(receivePacket.getData(), 0,
                     receivePacket.getLength());
 
-            System.out.println("Received: " + sentence);
+            sentence = sentence.replace("tbh", "to be honest");
+            sentence = sentence.replace("ig", "I guess");
+            sentence = sentence.replace("tbf", "to be fair");
+            sentence = sentence.replace("atm", "at the moment");
+            sentence = sentence.replace("irl", "in real life");
+            sentence = sentence.replace("lol", "laughing out loud");
+            sentence = sentence.replace("asap", "as soon as possible");
+            sentence = sentence.replace("omg", "oh my God");
+            sentence = sentence.replace("ttyl", "talk to you later");
+            sentence = sentence.replace("idk", "I don't know");
+            sentence = sentence.replace("nvm", "never mind");
+            sentence = sentence.replace("idc", "I don't care");
 
-            String translated = translate(sentence, map);
-
-            sendData = translated.getBytes();
-
-            InetAddress clientIP = receivePacket.getAddress();
-            int clientPort = receivePacket.getPort();
+            byte[] sendData = sentence.getBytes();
 
             DatagramPacket sendPacket =
-                    new DatagramPacket(
-                            sendData,
-                            sendData.length,
-                            clientIP,
-                            clientPort);
+                    new DatagramPacket(sendData, sendData.length,
+                            receivePacket.getAddress(),
+                            receivePacket.getPort());
 
             socket.send(sendPacket);
-
-            System.out.println("Translated Sentence Sent: " + translated);
         }
-    }
-
-    public static String translate(String sentence,
-                                   Map<String, String> map) {
-
-        String[] words = sentence.split(" ");
-        StringBuilder result = new StringBuilder();
-
-        for (String word : words) {
-
-            String punctuation = "";
-
-            while (word.length() > 0 &&
-                    !Character.isLetterOrDigit(word.charAt(word.length() - 1))) {
-
-                punctuation = word.charAt(word.length() - 1) + punctuation;
-                word = word.substring(0, word.length() - 1);
-            }
-
-            String lower = word.toLowerCase();
-
-            if (map.containsKey(lower))
-                result.append(map.get(lower));
-            else
-                result.append(word);
-
-            result.append(punctuation).append(" ");
-        }
-
-        return result.toString().trim();
     }
 }
